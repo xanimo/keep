@@ -1,0 +1,1 @@
+packages="python3 nsis g++-mingw-w64-x86-64 wine-stable bc wine-binfmt"

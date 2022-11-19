@@ -1,0 +1,69 @@
+#!/bin/bash
+export LC_ALL=C
+set -e -o pipefail
+
+if [ $# -eq 0 ]; then
+    echo "No arguments provided"
+    exit 1
+fi
+
+config_env() {
+    case "$target_host_triplet" in
+        "arm-linux-gnueabihf")      target_arch="arm32v7";;
+        "aarch64-linux-gnu")        target_arch="arm64v8";;
+        "x86_64-pc-linux-gnu")      target_arch="amd64";;
+        "i686-pc-linux-gnu")        target_arch="i386";;
+        "x86_64-w64-mingw32")       target_arch="amd64";;
+        "i686-w64-mingw32")         target_arch="i386";;
+        "x86_64-apple-darwin11")    target_arch="amd64";;
+        "all")                      all_host_triplets=("x86_64-pc-linux-gnu" "i686-pc-linux-gnu" "aarch64-linux-gnu" "arm-linux-gnueabihf" "x86_64-w64-mingw32" "i686-w64-mingw32" "x86_64-apple-darwin11");;
+        *)                          error=1;;
+    esac
+}
+
+all_host_triplets=""
+target_host_triplet=""
+for i in "$@"
+do
+case $i in
+    -c=*|--commit=*)    commit="${i#*=}";;
+    -f=*|--flavor=*)    flavor="${i#*=}";;
+    -h=*|--host=*)      host="${i#*=}"
+                        target_host_triplet=($host)
+                        config_env;;
+    -i=*|--image=*)     image="${i#*=}";;
+    -m=*|--memory=*)    memory="${i#*=}";;
+    -n=*|--name=*)      name="${i#*=}";;
+    -p|--push)          push=1;;
+    -o=*|--os=*)        os="${i#*=}";;
+    -u=*|--url=*)       url="${i#*=}";;
+    *)                  error=1;;
+esac
+done
+
+if [ "$error" ]; then
+    echo "Please provide a host to build and try again."
+    exit $error
+fi
+
+build() {
+    docker build \
+    --memory=${memory:-"14gb"} \
+    --build-arg os=${os:-"ubuntu"} \
+    --build-arg flavor=${flavor:-"bionic"} \
+    --build-arg arch=$target_arch \
+    --build-arg target_host=$target_host_triplet \
+    -t "$(docker info | grep Username: | cut -d " " -f 3)/"${name:-$os}:$flavor-$target_host_triplet .
+    if [ "${push}" ]; then docker push "$(docker info | grep Username: | cut -d " " -f 3)/"${name:-$os}:$flavor-$target_host_triplet; fi
+}
+
+if [[ "$all_host_triplets" != "" ]]; then
+    end=$((${#all_host_triplets[@]} - 1))
+    for i in "${!all_host_triplets[@]}"
+    do
+    :
+        target_host_triplet="${all_host_triplets[$i]}"
+        config_env
+        build
+    done
+fi
