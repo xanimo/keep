@@ -62,7 +62,8 @@ build() {
         name=$github_repo
         tag=$commit-
     fi
-    docker_user="$(docker info | grep Username: | cut -d " " -f 3)/"
+    # docker_user="$(docker info | grep Username: | cut -d " " -f 3)/"
+    docker_user="xanimo/"
     tag_suffix=$flavor-$target_host_triplet
     dockerfile_suffix="$(echo $dockerfile | cut -d "." -f 2)"
     if [ "$dockerfile" == "$dockerfile_suffix" ]; then
