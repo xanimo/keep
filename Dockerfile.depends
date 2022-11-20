@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1
+ARG os
+ARG arch
+ARG flavor
+ARG docker_user
+ARG target_host
+
+FROM ${docker_user}${os}:${flavor}-${target_host} AS base
+ARG sdk
+ARG url
+ARG commit
+ARG github_user
+ARG github_repo
+ARG target_host
+
+# configure shell to use bash
+SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
+
+# fetch repository with depends
+RUN git clone ${url} /build
+
+WORKDIR /build
+
+COPY /scripts/base .
+COPY /deps/${target_host} .
+
+RUN if [ $(source ${target_host}; echo ${sdk}) ]; then ./base --host=${target_host} --docker --sdk; fi
+
+RUN git checkout ${commit} \
+    && make -j$(nproc) -C depends  HOST=${target_host} $(source ${target_host}; echo ${dep_opts})

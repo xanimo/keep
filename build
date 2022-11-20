@@ -7,6 +7,8 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+all_host_triplets=""
+target_host_triplet=""
 config_env() {
     case "$target_host_triplet" in
         "arm-linux-gnueabihf")      target_arch="arm32v7";;
@@ -19,14 +21,14 @@ config_env() {
         "all")                      all_host_triplets=("x86_64-pc-linux-gnu" "i686-pc-linux-gnu" "aarch64-linux-gnu" "arm-linux-gnueabihf" "x86_64-w64-mingw32" "i686-w64-mingw32" "x86_64-apple-darwin11");;
         *)                          error=1;;
     esac
+    if [ ! "$all_host_triplets" ]; then all_host_triplets=($target_host_triplet); fi
 }
 
-all_host_triplets=""
-target_host_triplet=""
 for i in "$@"
 do
 case $i in
     -c=*|--commit=*)    commit="${i#*=}";;
+    -file=*|--file=*)   dockerfile="${i#*=}";;
     -f=*|--flavor=*)    flavor="${i#*=}";;
     -h=*|--host=*)      host="${i#*=}"
                         target_host_triplet=($host)
@@ -36,6 +38,7 @@ case $i in
     -n=*|--name=*)      name="${i#*=}";;
     -p|--push)          push=1;;
     -o=*|--os=*)        os="${i#*=}";;
+    -user=*|--user=*)   user="${i#*=}";;
     -u=*|--url=*)       url="${i#*=}";;
     *)                  error=1;;
 esac
@@ -47,14 +50,41 @@ if [ "$error" ]; then
 fi
 
 build() {
+    re="^(https|git)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)(.git)*$"
+    if [[ $url =~ $re ]]; then
+        protocol=${BASH_REMATCH[1]}
+        separator=${BASH_REMATCH[2]}
+        hostname=${BASH_REMATCH[3]}
+        github_user=${BASH_REMATCH[4]}
+        github_repo=${BASH_REMATCH[5]}
+    fi
+    if [ "$github_repo" ]; then
+        name=$github_repo
+        tag=$commit-
+    fi
+    docker_user="$(docker info | grep Username: | cut -d " " -f 3)/"
+    tag_suffix=$flavor-$target_host_triplet
+    dockerfile_suffix="$(echo $dockerfile | cut -d "." -f 2)"
+    if [ "$dockerfile" == "$dockerfile_suffix" ]; then
+        tag+=$tag_suffix;
+    else
+        tag+=$dockerfile_suffix-$tag_suffix;
+    fi
+
     docker build \
     --memory=${memory:-"14gb"} \
+    -f ${dockerfile:-Dockerfile} \
+    --build-arg url=$url \
+    --build-arg commit=$commit \
+    --build-arg github_user=$github_user \
+    --build-arg github_repo=$github_repo \
+    --build-arg arch=$target_arch \
     --build-arg os=${os:-"ubuntu"} \
     --build-arg flavor=${flavor:-"bionic"} \
-    --build-arg arch=$target_arch \
+    --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
-    -t "$(docker info | grep Username: | cut -d " " -f 3)/"${name:-$os}:$flavor-$target_host_triplet .
-    if [ "${push}" ]; then docker push "$(docker info | grep Username: | cut -d " " -f 3)/"${name:-$os}:$flavor-$target_host_triplet; fi
+    -t ${user:-$docker_user}${name:-$os}:$tag --no-cache .
+    if [ "${push}" ]; then docker push ${user:-$docker_user}${name:-$os}:$tag; fi
 }
 
 if [[ "$all_host_triplets" != "" ]]; then

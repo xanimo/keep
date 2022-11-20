@@ -1,1 +1,1 @@
-packages="bc python3-pip python3-setuptools python3-zmq nsis g++-mingw-w64-x86-64 wine-stable bc wine-binfmt"
+packages="bc python3-pip python3-setuptools python3-zmq nsis g++-mingw-w64-x86-64 wine64 bc wine-binfmt"

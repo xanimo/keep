@@ -13,5 +13,5 @@ COPY /scripts/base .
 COPY /deps/${target_host} .
 
 # install arch specific packages
-RUN ./base --host=${target_host} --docker \
+RUN ./base --host=${target_host} --docker --packages \
     && rm -rf scripts/ deps/

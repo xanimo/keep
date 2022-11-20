@@ -1,32 +1,26 @@
 #!/bin/bash
 export LC_ALL=C
 
-USE_SUDO="sudo"
+use_sudo="sudo"
 for i in "$@"
 do
 case $i in
-    -h=*|--host=*) HOST="${i#*=}";;
-    -d|--docker) USE_SUDO="";;
-    *) ERROR=1;;
+    -d|--docker)    use_sudo="";;
+    -h=*|--host=*)  host="${i#*=}";;
+    -p|--packages)  packages=1;;
+    -s|--sdk)       setup_sdk=1;;
+    *)              error=1;;
 esac
 done
 
-if [ "$ERROR" ]; then
+if [ "$error" ]; then
     echo "Please provide a host to build and try again."
-    exit $ERROR
+    exit $error
 fi
 
-check_tools() {
-    for cmd in "$@"; do
-        if ! command -v "$cmd" > /dev/null 2>&1; then
-            echo "ERR: This script requires that '$cmd' is installed and available in your \$PATH"
-            echo $@
-        fi
-    done
-}
-
-$USE_SUDO apt-get update \
-&& $USE_SUDO apt-get install --no-install-recommends -y \
+if [ "$packages" ]; then
+$use_sudo apt-get update \
+&& $use_sudo apt-get install --no-install-recommends -y \
 build-essential \
 libtool \
 autotools-dev \
@@ -41,9 +35,31 @@ rsync \
 git \
 procps \
 bison \
+binutils-gold \
+libbsd-dev \
 libboost-dev \
-$(source $HOST; echo $packages) \
+libunwind-dev \
+$(source $host; echo $packages) \
 && rm -rf /var/lib/apt/lists/* /tmp/* \
-&& $USE_SUDO apt clean \
-&& $USE_SUDO apt-get autoclean \
-&& $USE_SUDO apt-get autoremove
+&& $use_sudo apt-get autoclean \
+&& $use_sudo apt-get autoremove
+
+if [ "$host" != "x86_64-w64-mingw32" ] || [ "$host" != "i686-w64-mingw32" ]; then
+    $use_sudo dpkg -s mono-runtime && sudo apt-get remove mono-runtime || echo "Very nothing to uninstall."
+    $use_sudo update-alternatives --set $host-gcc  /usr/bin/$host-gcc-posix
+    $use_sudo update-alternatives --set $host-g++  /usr/bin/$host-g++-posix
+    $use_sudo update-binfmts --import /usr/share/binfmts/wine
+fi
+fi
+
+if [ "$setup_sdk" ]; then
+    sdk_version=$(source $host; echo $sdk)
+    sdk_shasum=$(source $host; echo $sdk_shasum)
+    sdk_filename=$(source $host; echo $sdk_filename)
+    sdk_url=$(source $host; echo $sdk_url)/$sdk_filename
+    mkdir -p ./depends/sdk-sources
+    mkdir -p ./depends/SDKs
+    curl -L --fail $sdk_url -o ./depends/sdk-sources/$sdk_filename && \
+    echo "$sdk_shasum  depends/sdk-sources/$sdk_filename" | sha256sum -c
+    tar -C depends/SDKs -xf depends/sdk-sources/$sdk_filename
+fi
