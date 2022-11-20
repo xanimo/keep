@@ -41,4 +41,4 @@ jobs:
 
     - name: Build image for ${{ matrix.host }}
       run: |
-        ./build --os=ubuntu --flavor=bionic --host=${{ matrix.host }} --url=https://github.com/dogecoin/dogecoin --commit=1.14.7-dev
+        ./build --os=ubuntu --flavor=bionic --host=${{ matrix.host }} -file=Dockerfile.depends --url=https://github.com/dogecoin/dogecoin --commit=1.14.7-dev
