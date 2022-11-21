@@ -19,7 +19,8 @@ if [ "$error" ]; then
 fi
 
 if [ "$packages" ]; then
-$use_sudo apt-get clean \
+DEBIAN_FRONTEND=noninteractive \
+&& $use_sudo apt-get clean \
 && $use_sudo apt-get update \
 && $use_sudo apt-get install --no-install-recommends -y \
 autoconf \
