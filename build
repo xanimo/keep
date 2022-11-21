@@ -81,7 +81,7 @@ build() {
     --build-arg github_repo=$github_repo \
     --build-arg arch=$target_arch \
     --build-arg os=${os:-"ubuntu"} \
-    --build-arg flavor=${flavor:-"bionic"} \
+    --build-arg flavor=${flavor:-"focal"} \
     --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
     -t ${user:-$docker_user}${name:-$os}:$tag .
