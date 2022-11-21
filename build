@@ -74,7 +74,7 @@ build() {
 
     docker build \
     --memory=${memory:-"14gb"} \
-    -f ${dockerfile:-Dockerfile} \
+    -f ${dockerfile:-Dockerfile.depends} \
     --build-arg url=$url \
     --build-arg commit=$commit \
     --build-arg github_user=$github_user \
