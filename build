@@ -59,8 +59,7 @@ build() {
         github_user=${BASH_REMATCH[4]}
         github_repo=${BASH_REMATCH[5]}
     fi
-    # docker_user="$(docker info | grep Username: | cut -d " " -f 3)/"
-    docker_user="xanimo/"
+    docker_user="$(docker info | grep Username: | cut -d " " -f 3)/"
     tag_suffix=$flavor-$target_host_triplet;
     dockerfile_suffix="$(echo $dockerfile | cut -d "." -f 2)"
     if [ "$dockerfile" == "$dockerfile_suffix" ]; then
