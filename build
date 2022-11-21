@@ -76,7 +76,7 @@ build() {
     --memory=${memory:-"14gb"} \
     -f ${dockerfile:-Dockerfile.depends} \
     --build-arg url=$url \
-    --build-arg commit=$commit \
+    --build-arg commit=${commit:-"1.14.7-dev"} \
     --build-arg github_user=$github_user \
     --build-arg github_repo=$github_repo \
     --build-arg arch=$target_arch \
