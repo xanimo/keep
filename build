@@ -85,7 +85,7 @@ build() {
     --build-arg flavor=${flavor:-"focal"} \
     --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
-    -t ${user:-$docker_user}${name:-$os}:$tag --load .
+    -t ${user:-$docker_user}${name:-$os}:$tag --load . --progress plain
     if [[ "${push}" != 0 ]]; then docker push ${user:-$docker_user}${name:-$os}:$tag; fi
 }
 

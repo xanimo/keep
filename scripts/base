@@ -25,8 +25,9 @@ if [[ "$host" == *"i686-"* ]]; then
     $use_sudo dpkg --add-architecture i386
 fi
 
-$use_sudo apt-get clean \
-&& $use_sudo apt-get update \
+$use_sudo apt-get update && $use_sudo apt-get install -y --no-install-recommends $(source $host; echo $packages)
+
+$use_sudo apt-get update \
 && $use_sudo apt-get install --no-install-recommends -y \
 autoconf \
 autotools-dev \
@@ -37,9 +38,9 @@ build-essential \
 bsdmainutils \
 curl \
 ca-certificates \
-ccache \
 faketime \
 git \
+git-core \
 libtool \
 libtool-bin \
 libbsd-dev \
@@ -51,10 +52,8 @@ pkg-config \
 procps \
 rsync \
 tzdata \
-$(source $host; echo $packages;) \
 && rm -rf /var/lib/apt/lists/* /tmp/* \
-&& $use_sudo apt-get autoclean \
-&& $use_sudo apt-get autoremove
+&& $use_sudo apt-get autoclean
 if [[ "$host" == *"-w64-mingw32"* ]]; then
     $use_sudo update-alternatives --set $host-g++  /usr/bin/$host-g++-posix
     $use_sudo update-alternatives --set $host-gcc  /usr/bin/$host-gcc-posix

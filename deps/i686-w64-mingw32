@@ -1,4 +1,4 @@
-packages="python3-pip python3-setuptools python3-zmq nsis g++ g++-mingw-w64-i686 mingw-w64-i686-dev wine-stable bc wine-binfmt"
+packages="git git-core python3-pip python3-setuptools g++ g++-mingw-w64-i686 mingw-w64-i686-dev wine-stable bc wine-binfmt binfmt-support"
 run_bench=1
 run_tests=1
 check_security=1
