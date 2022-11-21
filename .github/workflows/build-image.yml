@@ -29,7 +29,7 @@ jobs:
           - name: i686-linux
             host: i686-pc-linux-gnu
           - name: x86_64-macos
-            host: x86_64-apple-darwin14
+            host: x86_64-apple-darwin11
           - name: x86_64-win
             host: x86_64-w64-mingw32
           - name: i686-win
