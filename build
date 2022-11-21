@@ -75,7 +75,7 @@ build() {
     docker build \
     --memory=${memory:-"14gb"} \
     -f ${dockerfile:-Dockerfile.depends} \
-    --build-arg url=$url \
+    --build-arg url=${url:-"https://github.com/dogecoin/dogecoin"} \
     --build-arg commit=${commit:-"1.14.7-dev"} \
     --build-arg github_user=$github_user \
     --build-arg github_repo=$github_repo \
