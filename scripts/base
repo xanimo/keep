@@ -19,8 +19,8 @@ if [ "$error" ]; then
 fi
 
 if [ "$packages" ]; then
-DEBIAN_FRONTEND=noninteractive \
-&& $use_sudo apt-get clean \
+$use_sudo ln -snf /usr/share/zoneinfo/'America/Los_Angeles' /etc/localtime && echo 'America/Los_Angeles' > /etc/timezone
+$use_sudo apt-get clean \
 && $use_sudo apt-get update \
 && $use_sudo apt-get install --no-install-recommends -y \
 autoconf \
@@ -45,6 +45,7 @@ python3 \
 pkg-config \
 procps \
 rsync \
+tzdata \
 $(source $host; echo $packages;) \
 && rm -rf /var/lib/apt/lists/* /tmp/* \
 && $use_sudo apt-get autoclean \
