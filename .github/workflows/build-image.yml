@@ -47,4 +47,4 @@ jobs:
       uses: docker/setup-buildx-action@v2.2.1
 
     - name: Build image for ${{ matrix.host }}
-      run: ./build --os=ubuntu --flavor=bionic --host=${{ matrix.host }} -file=Dockerfile.depends --url=https://github.com/dogecoin/dogecoin --commit=1.14.7-dev
+      run: ./build --host=${{ matrix.host }}
