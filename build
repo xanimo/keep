@@ -50,6 +50,7 @@ if [ "$error" ]; then
 fi
 
 build() {
+    source .env
     re="^(https|git)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)(.git)*$"
     if [[ $url =~ $re ]]; then
         protocol=${BASH_REMATCH[1]}
@@ -75,8 +76,8 @@ build() {
     docker build \
     --memory=${memory:-"14gb"} \
     -f ${dockerfile:-Dockerfile.depends} \
-    --build-arg url=${url:-"https://github.com/dogecoin/dogecoin"} \
-    --build-arg commit=${commit:-"1.14.7-dev"} \
+    --build-arg url=${url} \
+    --build-arg commit=${commit} \
     --build-arg github_user=$github_user \
     --build-arg github_repo=$github_repo \
     --build-arg arch=$target_arch \
