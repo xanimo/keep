@@ -27,4 +27,4 @@ COPY /deps/${target_host} .
 RUN if [ $(source ${target_host}; echo ${sdk}) ]; then ./base --host=${target_host} --docker --sdk; fi
 
 RUN git checkout ${commit} \
-    && make -j$(nproc) -C depends  HOST=${target_host} $(source ${target_host}; echo ${dep_opts})
+    && make -j$(nproc) -C depends HOST=${target_host} $(source ${target_host}; echo ${dep_opts})

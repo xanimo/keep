@@ -58,18 +58,18 @@ build() {
         github_user=${BASH_REMATCH[4]}
         github_repo=${BASH_REMATCH[5]}
     fi
-    if [ "$github_repo" ]; then
-        name=$github_repo
-        tag=$commit-
-    fi
     # docker_user="$(docker info | grep Username: | cut -d " " -f 3)/"
     docker_user="xanimo/"
-    tag_suffix=$flavor-$target_host_triplet
+    tag_suffix=$flavor-$target_host_triplet;
     dockerfile_suffix="$(echo $dockerfile | cut -d "." -f 2)"
     if [ "$dockerfile" == "$dockerfile_suffix" ]; then
-        tag+=$tag_suffix;
+        tag=$tag_suffix;
     else
-        tag+=$dockerfile_suffix-$tag_suffix;
+        tag=$dockerfile_suffix-$tag_suffix;
+    fi
+    if [ "$github_repo" ]; then
+        name=$github_repo
+        tag=$commit-$tag
     fi
 
     docker build \
@@ -84,7 +84,7 @@ build() {
     --build-arg flavor=${flavor:-"bionic"} \
     --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
-    -t ${user:-$docker_user}${name:-$os}:$tag --no-cache .
+    -t ${user:-$docker_user}${name:-$os}:$tag .
     if [ "${push}" ]; then docker push ${user:-$docker_user}${name:-$os}:$tag; fi
 }
 

@@ -19,35 +19,38 @@ if [ "$error" ]; then
 fi
 
 if [ "$packages" ]; then
-$use_sudo apt-get update \
+$use_sudo apt-get clean \
+&& $use_sudo apt-get update \
 && $use_sudo apt-get install --no-install-recommends -y \
-build-essential \
-libtool \
+autoconf \
 autotools-dev \
 automake \
-pkg-config \
+bison \
+binutils-gold \
+build-essential \
 bsdmainutils \
 curl \
 ca-certificates \
 ccache \
-python3 \
-rsync \
+faketime \
 git \
-procps \
-bison \
-binutils-gold \
+libtool \
+libtool-bin \
 libbsd-dev \
 libboost-dev \
 libunwind-dev \
-$(source $host; echo $packages) \
+python \
+python3 \
+pkg-config \
+procps \
+rsync \
+$(source $host; echo $packages;) \
 && rm -rf /var/lib/apt/lists/* /tmp/* \
 && $use_sudo apt-get autoclean \
 && $use_sudo apt-get autoremove
-
-if [ "$host" != "x86_64-w64-mingw32" ] || [ "$host" != "i686-w64-mingw32" ]; then
-    $use_sudo dpkg -s mono-runtime && sudo apt-get remove mono-runtime || echo "Very nothing to uninstall."
-    $use_sudo update-alternatives --set $host-gcc  /usr/bin/$host-gcc-posix
+if [[ "$host" == *"-w64-mingw32"* ]]; then
     $use_sudo update-alternatives --set $host-g++  /usr/bin/$host-g++-posix
+    $use_sudo update-alternatives --set $host-gcc  /usr/bin/$host-gcc-posix
     $use_sudo update-binfmts --import /usr/share/binfmts/wine
 fi
 fi
