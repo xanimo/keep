@@ -3,7 +3,7 @@ ARG os
 ARG arch
 ARG flavor
 
-FROM ${arch}/${os}:${flavor} AS base
+FROM --platform=$BUILDPLATFORM ${arch}/${os}:${flavor} AS base
 ARG target_host
 
 # configure shell to use bash

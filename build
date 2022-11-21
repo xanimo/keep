@@ -11,13 +11,13 @@ all_host_triplets=""
 target_host_triplet=""
 config_env() {
     case "$target_host_triplet" in
-        "arm-linux-gnueabihf")      target_arch="arm32v7";;
-        "aarch64-linux-gnu")        target_arch="arm64v8";;
-        "x86_64-pc-linux-gnu")      target_arch="amd64";;
-        "i686-pc-linux-gnu")        target_arch="i386";;
-        "x86_64-w64-mingw32")       target_arch="amd64";;
-        "i686-w64-mingw32")         target_arch="i386";;
-        "x86_64-apple-darwin11")    target_arch="amd64";;
+        "arm-linux-gnueabihf")      target_arch=(arm32v7 linux/arm/v7);;
+        "aarch64-linux-gnu")        target_arch=(arm64v8 linux/arm64);;
+        "x86_64-pc-linux-gnu")      target_arch=(amd64 linux/amd64);;
+        "i686-pc-linux-gnu")        target_arch=(i386 linux/386);;
+        "x86_64-w64-mingw32")       target_arch=(amd64 linux/amd64);;
+        "i686-w64-mingw32")         target_arch=(i386 linux/386);;
+        "x86_64-apple-darwin11")    target_arch=(amd64 linux/amd64);;
         "all")                      all_host_triplets=("x86_64-pc-linux-gnu" "i686-pc-linux-gnu" "aarch64-linux-gnu" "arm-linux-gnueabihf" "x86_64-w64-mingw32" "i686-w64-mingw32" "x86_64-apple-darwin11");;
         *)                          error=1;;
     esac
@@ -72,20 +72,21 @@ build() {
         tag=$commit-$tag
     fi
 
-    docker build \
+    docker buildx build \
     --memory=${memory:-"14gb"} \
     -f ${dockerfile:-Dockerfile.depends} \
     --build-arg url=${url} \
     --build-arg commit=${commit} \
     --build-arg github_user=$github_user \
     --build-arg github_repo=$github_repo \
-    --build-arg arch=$target_arch \
+    --build-arg arch=${target_arch[0]} \
+    --platform ${target_arch[1]} \
     --build-arg os=${os:-"ubuntu"} \
     --build-arg flavor=${flavor:-"focal"} \
     --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
-    -t ${user:-$docker_user}${name:-$os}:$tag .
-    if [ "${push}" ]; then docker push ${user:-$docker_user}${name:-$os}:$tag; fi
+    -t ${user:-$docker_user}${name:-$os}:$tag --load .
+    if [[ "${push}" != 0 ]]; then docker push ${user:-$docker_user}${name:-$os}:$tag; fi
 }
 
 if [[ "$all_host_triplets" != "" ]]; then

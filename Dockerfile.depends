@@ -5,7 +5,7 @@ ARG flavor
 ARG docker_user
 ARG target_host
 
-FROM ${docker_user}${os}:${flavor}-${target_host} AS base
+FROM --platform=$BUILDPLATFORM ${docker_user}${os}:${flavor}-${target_host} AS base
 ARG sdk
 ARG url
 ARG commit
