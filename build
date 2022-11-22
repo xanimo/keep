@@ -51,6 +51,7 @@ fi
 
 build() {
     source .env
+    source ./deps/$target_host_triplet
     re="^(https|git)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)(.git)*$"
     if [[ $url =~ $re ]]; then
         protocol=${BASH_REMATCH[1]}

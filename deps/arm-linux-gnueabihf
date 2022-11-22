@@ -1,1 +1,2 @@
 packages="g++-arm-linux-gnueabihf"
+flavor="bionic"
