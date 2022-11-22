@@ -7,6 +7,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+use_dotenv=0
 all_host_triplets=""
 target_host_triplet=""
 config_env() {
@@ -32,11 +33,13 @@ case $i in
     -f=*|--flavor=*)    flavor="${i#*=}";;
     -h=*|--host=*)      host="${i#*=}"
                         target_host_triplet=($host)
-                        config_env;;
+                        config_env
+                        source .env
+                        source ./deps/$target_host_triplet;;
     -i=*|--image=*)     image="${i#*=}";;
     -m=*|--memory=*)    memory="${i#*=}";;
     -n=*|--name=*)      name="${i#*=}";;
-    -p|--push)          push=1;;
+    -p=*|--push=*)      push="${i#*=}";;
     -o=*|--os=*)        os="${i#*=}";;
     -user=*|--user=*)   user="${i#*=}";;
     -u=*|--url=*)       url="${i#*=}";;
@@ -50,8 +53,6 @@ if [ "$error" ]; then
 fi
 
 build() {
-    source .env
-    source ./deps/$target_host_triplet
     re="^(https|git)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+)\/(.+)(.git)*$"
     if [[ $url =~ $re ]]; then
         protocol=${BASH_REMATCH[1]}
