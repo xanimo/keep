@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1
+ARG os
+ARG arch
+ARG image
+ARG flavor
+ARG docker_user
+ARG target_host
+
+FROM --platform=$BUILDPLATFORM ${image:-${docker_user}${os}:${flavor}-${target_host}} AS depends
+ARG sdk
+ARG url
+ARG commit
+ARG github_user
+ARG github_repo
+ARG target_host
+
+# configure shell to use bash
+SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
+
+RUN ./autogen.sh
+RUN ./configure --prefix=`pwd`/depends/${target_host} $(source ${target_host}; echo ${config_opts}) --enable-reduce-exports
+RUN make -j$(nproc)

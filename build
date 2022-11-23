@@ -72,11 +72,17 @@ build() {
     if [ "$github_repo" ]; then
         name=$github_repo
         tag=$commit-$tag
+        if [ ! "$image" ]; then
+            case "$dockerfile_suffix" in
+                "build")    image=$docker_user$name:$commit-depends-$flavor-$target_host_triplet;;
+            esac
+        fi
     fi
 
     docker buildx build \
     --memory=${memory:-"14gb"} \
     -f ${dockerfile:-Dockerfile.depends} \
+    --build-arg image=${image} \
     --build-arg url=${url} \
     --build-arg commit=${commit} \
     --build-arg github_user=$github_user \
