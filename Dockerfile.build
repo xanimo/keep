@@ -17,6 +17,9 @@ ARG target_host
 # configure shell to use bash
 SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
 
+COPY /deps/${target_host} .
 RUN ./autogen.sh
 RUN ./configure --prefix=`pwd`/depends/${target_host} --enable-reduce-exports $(source ${target_host}; echo ${config_opts})
 RUN make -j$(nproc)
+RUN if [ $(source ${target_host}; echo $check_security) == 1 ]; then make -C src check-security; fi
+RUN if [ $(source ${target_host}; echo $check_symbols) == 1 ]; then make -C src check-symbols; fi
