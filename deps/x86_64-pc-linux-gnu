@@ -1,1 +1,7 @@
 packages="bc python3-pip python3-setuptools python3-zmq"
+run_bench=1
+run_tests=1
+check_security=1
+check_symbols=1
+dep_opts="DEBUG=1"
+config_opts="--with-gui=qt5 --enable-zmq --enable-glibc-back-compat CPPFLAGS=-DDEBUG_LOCKORDER"

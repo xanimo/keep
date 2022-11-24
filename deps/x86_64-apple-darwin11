@@ -4,3 +4,9 @@ sdk=10.11
 sdk_shasum="bec9d089ebf2e2dd59b1a811a38ec78ebd5da18cbbcd6ab39d1e59f64ac5033f"
 sdk_filename=MacOSX$sdk.sdk.tar.gz
 flavor="bionic"
+run_bench=0
+run_tests=0
+check_security=0
+check_symbols=0
+dep_opts=""
+config_opts="--with-gui=qt5 --disable-tests"

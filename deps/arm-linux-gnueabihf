@@ -1,2 +1,8 @@
 packages="g++-arm-linux-gnueabihf"
 flavor="bionic"
+run_bench=1
+run_tests=1
+check_security=1
+check_symbols=1
+dep_opts="NO_QT=1"
+config_opts="--enable-glibc-back-compat LDFLAGS=-static-libstdc++"

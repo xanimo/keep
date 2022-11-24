@@ -18,5 +18,5 @@ ARG target_host
 SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
 
 RUN ./autogen.sh
-RUN ./configure --prefix=`pwd`/depends/${target_host} $(source ${target_host}; echo ${config_opts}) --enable-reduce-exports
+RUN ./configure --prefix=`pwd`/depends/${target_host} --enable-reduce-exports $(source ${target_host}; echo ${config_opts})
 RUN make -j$(nproc)
