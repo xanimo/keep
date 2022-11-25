@@ -1,4 +1,4 @@
-packages="git git-core g++-multilib bc python3-pip python3-setuptools binfmt-support"
+packages="git git-core g++-multilib bc python python3-pip python3-setuptools binfmt-support"
 run_bench=1
 run_tests=1
 check_security=1

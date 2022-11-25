@@ -1,4 +1,4 @@
-packages="bc python3-pip python3-setuptools python3-zmq"
+packages="bc python python3-pip python3-setuptools python3-zmq"
 run_bench=1
 run_tests=1
 check_security=1
