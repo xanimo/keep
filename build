@@ -35,7 +35,7 @@ case $i in
                         target_host_triplet=($host)
                         config_env
                         source .env
-                        source ./deps/$target_host_triplet;;
+                        if [ $host != "all" ]; then source ./deps/$target_host_triplet; fi;;
     -i=*|--image=*)     image="${i#*=}";;
     -m=*|--memory=*)    memory="${i#*=}";;
     -n=*|--name=*)      name="${i#*=}";;
@@ -90,7 +90,7 @@ build() {
     --build-arg arch=${target_arch[0]} \
     --platform ${target_arch[1]} \
     --build-arg os=${os:-"ubuntu"} \
-    --build-arg flavor=${flavor:-"focal"} \
+    --build-arg flavor=${flavor:-"bionic"} \
     --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
     -t ${user:-$docker_user}${name:-$os}:$tag --load .
