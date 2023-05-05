@@ -1,1 +1,4 @@
 packages="g++"
+run_tests=1
+dep_opts=""
+config_opts="--enable-static --disable-shared"

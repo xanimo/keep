@@ -1,1 +1,4 @@
 packages="g++-multilib bc python3-pip python3-setuptools python3-zmq"
+run_tests=1
+dep_opts=""
+config_opts=""

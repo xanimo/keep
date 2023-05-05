@@ -1,7 +1,4 @@
 packages="git-core python3-pip python3-setuptools python3-zmq nsis g++ g++-mingw-w64-i686 mingw-w64-i686-dev wine bc wine-binfmt binfmt-support"
-run_bench=1
 run_tests=1
-check_security=1
-check_symbols=0
 dep_opts=""
-config_opts="--enable-gui=qt5"
+config_opts=""

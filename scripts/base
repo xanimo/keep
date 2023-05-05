@@ -40,6 +40,7 @@ libtool-bin \
 libbsd-dev \
 libboost-dev \
 libunwind-dev \
+make \
 python \
 python3 \
 pkg-config \

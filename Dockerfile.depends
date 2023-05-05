@@ -5,7 +5,7 @@ ARG flavor
 ARG docker_user
 ARG target_host
 
-FROM ${docker_user}${os}:${flavor}-${target_host} AS base
+FROM ${arch}/${os}:${flavor} AS base
 ARG sdk
 ARG url
 ARG commit
@@ -16,15 +16,16 @@ ARG target_host
 # configure shell to use bash
 SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
 
-# fetch repository with depends
-RUN git clone ${url} /build
+COPY ${github_repo} ${github_repo}
 
-WORKDIR /build
+WORKDIR ${github_repo}
 
 COPY /scripts/base .
 COPY /deps/${target_host} .
 
 RUN if [ $(source ${target_host}; echo ${sdk}) ]; then ./base --host=${target_host} --docker --sdk; fi
-
-RUN git checkout ${commit} \
-    && make -j$(nproc) -C depends HOST=${target_host} $(source ${target_host}; echo ${dep_opts})
+RUN ./base --host=${target_host} --docker --packages
+RUN make -C depends HOST=${target_host} $(source ${target_host}; echo ${dep_opts})
+RUN ./autogen.sh
+RUN ./configure --prefix=`pwd`/depends/${target_host} $(source ${target_host}; echo ${config_opts})
+RUN make -j`nproc` check

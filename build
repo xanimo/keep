@@ -9,6 +9,7 @@ fi
 
 all_host_triplets=""
 target_host_triplet=""
+target_arch=""
 config_env() {
     case "$target_host_triplet" in
         "arm-linux-gnueabihf")      target_arch="arm32v7";;
@@ -71,10 +72,18 @@ build() {
         name=$github_repo
         tag=$commit-$tag
     fi
+    # check if directory exists:
+    if [ ! -d "$github_repo" ]; then
+        git clone ${url}
+    else
+        pushd ${github_repo}
+            git checkout ${commit}
+        popd
+    fi
 
-    docker build \
+    docker buildx build \
     --memory=${memory:-"14gb"} \
-    -f ${dockerfile:-Dockerfile.depends} \
+    -f ${dockerfile:-Dockerfile} \
     --build-arg url=${url} \
     --build-arg commit=${commit} \
     --build-arg github_user=$github_user \
@@ -84,7 +93,8 @@ build() {
     --build-arg flavor=${flavor:-"focal"} \
     --build-arg docker_user=${user:-$docker_user} \
     --build-arg target_host=$target_host_triplet \
-    -t ${user:-$docker_user}${name:-$os}:$tag .
+    -t ${user:-$docker_user}${name:-$os}:$tag . \
+    --load 2> $PWD/build-log.txt | sleep 2 | tail -f $PWD/build-log.txt
     if [ "${push}" ]; then docker push ${user:-$docker_user}${name:-$os}:$tag; fi
 }
 
