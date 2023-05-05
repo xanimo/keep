@@ -59,6 +59,7 @@ if [[ "$host" == *"-w64-mingw32"* ]]; then
     $use_sudo update-alternatives --set $host-gcc  /usr/bin/$host-gcc-posix
     $use_sudo update-binfmts --import /usr/share/binfmts/wine
 fi
+python3 -m pip install lief
 fi
 
 if [ "$setup_sdk" ]; then

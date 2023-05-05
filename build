@@ -74,9 +74,20 @@ build() {
         tag=$commit-$tag
         if [ ! "$image" ]; then
             case "$dockerfile_suffix" in
-                "build")    image=$docker_user$name:$commit-depends-$flavor-$target_host_triplet;;
+                "build")    image=$docker_user$name:depends-$flavor-$target_host_triplet;;
             esac
         fi
+    fi
+    # check if directory exists:
+    if [ ! -d "$github_repo" ]; then
+        git clone ${url}
+        pushd ${github_repo}
+            git checkout ${commit}
+        popd
+    else
+        pushd ${github_repo}
+            git checkout ${commit}
+        popd
     fi
 
     docker buildx build \

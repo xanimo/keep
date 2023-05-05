@@ -53,4 +53,4 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build ${{ matrix.host }} and push to Docker Hub
-      run: ./build --host=${{ matrix.host }} --image=xanimo/dogecoin:1.14.7-dev-depends-bionic-${{ matrix.host }}
+      run: ./build --host=${{ matrix.host }}

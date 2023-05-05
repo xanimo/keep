@@ -1,5 +1,5 @@
-packages="bc python3-pip python3-setuptools python3-zmq nsis g++-mingw-w64-x86-64 wine64 bc wine-binfmt"
-run_bench=1
+packages="git git-core bc python3-pip python3-setuptools python3-zmq nsis g++-mingw-w64-x86-64 wine64 bc wine-binfmt"
+run_bench=0
 run_tests=1
 check_security=1
 check_symbols=1

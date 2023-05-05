@@ -5,7 +5,7 @@ ARG flavor
 ARG docker_user
 ARG target_host
 
-FROM --platform=$BUILDPLATFORM ${docker_user}${os}:${flavor}-${target_host} AS base
+FROM --platform=$BUILDPLATFORM ${arch}/${os}:${flavor}-${target_host} AS base
 ARG sdk
 ARG url
 ARG commit
@@ -17,14 +17,28 @@ ARG target_host
 SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
 
 # fetch repository with depends
-RUN git clone ${url} /build
+RUN git clone ${url}
 
-WORKDIR /build
+WORKDIR ${github_repo}
 
 COPY /scripts/base .
 COPY /deps/${target_host} .
 
+# install arch specific packages
+RUN ./base --host=${target_host} --docker --packages \
+    && rm -rf scripts/ deps/
+
+# install sdk if building darwin
 RUN if [ $(source ${target_host}; echo ${sdk}) ]; then ./base --host=${target_host} --docker --sdk; fi
 
 RUN git checkout ${commit} \
     && make -j$(nproc) -C depends HOST=${target_host} $(source ${target_host}; echo ${dep_opts})
+RUN ./autogen.sh
+RUN ./configure --prefix=`pwd`/depends/${target_host} --enable-reduce-exports $(source ${target_host}; echo ${config_opts})
+RUN make -j$(nproc)
+RUN if [ $(source ${target_host}; echo $run_bench) == 1 ]; then ./src/bench/bench_dogecoin; fi
+RUN if [ $(source ${target_host}; echo $run_tests) == 1 ]; then \
+    make check -j$(nproc) V=1; \
+    fi
+RUN if [ $(source ${target_host}; echo $check_security) == 1 ]; then make -C src check-security; fi
+RUN if [ $(source ${target_host}; echo $check_symbols) == 1 ]; then make -C src check-symbols; fi

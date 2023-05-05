@@ -1,4 +1,4 @@
-packages="g++"
+packages="git git-core g++"
 run_bench=1
 run_tests=1
 check_security=1

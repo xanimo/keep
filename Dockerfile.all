@@ -1,12 +1,11 @@
 # syntax=docker/dockerfile:1
 ARG os
 ARG arch
-ARG image
 ARG flavor
 ARG docker_user
 ARG target_host
 
-FROM --platform=$BUILDPLATFORM ${image:-${arch}/${os}:${flavor}-${target_host}} AS depends
+FROM --platform=$BUILDPLATFORM ${arch}/${os}:${flavor} AS base
 ARG sdk
 ARG url
 ARG commit
@@ -17,7 +16,21 @@ ARG target_host
 # configure shell to use bash
 SHELL ["/bin/bash", "-ex", "-o", "pipefail", "-c"]
 
+COPY ${github_repo} ${github_repo}
+
+WORKDIR ${github_repo}
+
+COPY /scripts/base .
 COPY /deps/${target_host} .
+
+# install arch specific packages
+RUN ./base --host=${target_host} --docker --packages
+
+# install sdk if building darwin
+RUN if [ $(source ${target_host}; echo ${sdk}) ]; then ./base --host=${target_host} --docker --sdk; fi
+
+RUN git checkout ${commit} \
+    && make -j$(nproc) -C depends HOST=${target_host} $(source ${target_host}; echo ${dep_opts})
 RUN ./autogen.sh
 RUN ./configure --prefix=`pwd`/depends/${target_host} --enable-reduce-exports $(source ${target_host}; echo ${config_opts})
 RUN make -j$(nproc)
